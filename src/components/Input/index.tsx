@@ -1,49 +1,67 @@
 import React, {
   InputHTMLAttributes,
-  useCallback,
   useEffect,
   useRef,
   useState,
+  useCallback,
 } from 'react';
-import { useField } from '@unform/core';
 import { IconBaseProps } from 'react-icons';
 import { FiAlertCircle } from 'react-icons/fi';
+import { useField } from '@unform/core';
+
 import { Container, Error } from './styles';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string;
+  containerStyle?: React.CSSProperties;
   icon?: React.ComponentType<IconBaseProps>;
 }
 
-const Input: React.FC<InputProps> = ({ name, icon: Icon, ...rest }) => {
-  const { fieldName, registerField, error, defaultValue } = useField(name);
+const Input: React.FC<InputProps> = ({
+  name,
+  containerStyle = {},
+  icon: Icon,
+  ...rest
+}) => {
   const inputRef = useRef<HTMLInputElement>(null);
-
   const [isFocused, setIsFocused] = useState(false);
   const [isFilled, setIsFilled] = useState(false);
 
-  useEffect(() => {
-    registerField({ name: fieldName, ref: inputRef.current, path: 'value' });
-  }, [fieldName, registerField]);
+  const { fieldName, defaultValue, error, registerField } = useField(name);
 
-  const handleOnFocus = useCallback(() => {
+  const handleInputFocus = useCallback(() => {
     setIsFocused(true);
   }, []);
 
-  const handleOnBlur = useCallback(() => {
+  const handleInputBlur = useCallback(() => {
     setIsFocused(false);
-    setIsFilled(!!inputRef?.current?.value);
+
+    setIsFilled(!!inputRef.current?.value);
   }, []);
 
+  useEffect(() => {
+    registerField({
+      name: fieldName,
+      ref: inputRef.current,
+      path: 'value',
+    });
+  }, [fieldName, registerField]);
+
   return (
-    <Container isErrored={!!error} isFocused={isFocused} isFilled={isFilled}>
+    <Container
+      style={containerStyle}
+      isErrored={!!error}
+      isFocused={isFocused}
+      isFilled={isFilled}
+    >
       {Icon && <Icon size={20} />}
       <input
-        onFocus={handleOnFocus}
-        onBlur={handleOnBlur}
+        onFocus={handleInputFocus}
+        onBlur={handleInputBlur}
         defaultValue={defaultValue}
         ref={inputRef}
         {...rest}
+        type="text"
       />
       {error && (
         <Error title={error}>

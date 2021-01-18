@@ -18,7 +18,7 @@ const toastTypeVariations = {
 
 interface ToastProps {
   type?: 'success' | 'info' | 'error';
-  hasDescription: boolean;
+  hasDescription: number;
 }
 
 export const Toast = styled(animated.div)<ToastProps>`
